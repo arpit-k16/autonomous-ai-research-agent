@@ -1,9 +1,13 @@
 """Streamlit UI for the autonomous agent.   Run:  streamlit run app.py"""
 from __future__ import annotations
 
+import faulthandler
 import os
+import sys
 
 import streamlit as st
+
+faulthandler.enable(file=sys.stderr, all_threads=True)  # a native crash prints every thread's Python stack to the logs
 
 try:  # Streamlit Cloud secrets -> env vars (before settings are read)
     for _k, _v in st.secrets.items():
