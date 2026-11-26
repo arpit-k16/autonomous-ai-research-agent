@@ -92,13 +92,6 @@ if st.button("🚀 Run agent", type="primary", disabled=not goal.strip()):
         finally:  # released by the worker, so a page reload mid-run can't leave the lock held
             lock.release()
 
-    # Diagnostics: if a run stalls, every thread's stack is written to outputs/stall_trace.log every 45 s.
-    import faulthandler
-    settings.output_dir.mkdir(parents=True, exist_ok=True)
-    trace_file = open(settings.output_dir / "stall_trace.log", "w", encoding="utf-8")
-    faulthandler.dump_traceback_later(45, repeat=True, file=trace_file)
-
-    faulthandler.enable(file=sys.stderr, all_threads=True)   # again: native libs imported since may replace the handler
     th = threading.Thread(target=worker, daemon=True)
     th.start()
     started, n_tools = time.time(), 0
@@ -135,16 +128,15 @@ if st.button("🚀 Run agent", type="primary", disabled=not goal.strip()):
             stage = STAGES.get(data["agent"].strip(), data["agent"])
             status.write(f"✅ **{stage}** complete")
 
-    faulthandler.cancel_dump_traceback_later()
-    trace_file.close()
 
     if "error" in box:
         raw = str(box["error"])
         low = raw.lower()
         is_rate = "rate_limit_exceeded" in low or "ratelimiterror" in low or "rate limit reached" in low
         if "daily_quota_exhausted" in low or (is_rate and ("per day" in low or "(tpd)" in low or "(rpd)" in low)):
-            msg = ("Groq's free **daily** limit for this model is used up. It resets within 24 h. "
-                   "Meanwhile, set `CHAT_MODEL=openai/gpt-oss-20b` (a separate daily quota) in `.env` and restart.")
+            other = "openai/gpt-oss-20b" if settings.chat_model != "openai/gpt-oss-20b" else "openai/gpt-oss-120b"
+            msg = (f"Groq's free **daily** limit for `{settings.chat_model}` is used up. It resets within 24 h. "
+                   f"Meanwhile you can set `CHAT_MODEL={other}` (a separate daily quota) in `.env` or the app's Secrets.")
         elif is_rate:
             msg = "Free-tier per-minute rate limit hit even after retries. Wait a minute and try again, or lower MAX_RPM."
         else:

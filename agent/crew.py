@@ -146,8 +146,8 @@ class NativeToolLLM(LLM):
                 if _is_daily_quota(exc):
                     raise ServiceQuotaExceededException(
                         f"DAILY_QUOTA_EXHAUSTED: Groq's free daily token allowance for {self.model} is used up "
-                        f"(it resets within 24 h). Set CHAT_MODEL=openai/gpt-oss-20b in .env, which has a "
-                        f"separate allowance, or try again tomorrow."
+                        f"(it resets within 24 h). Switch CHAT_MODEL to another free model (e.g. openai/gpt-oss-20b or "
+                        f"openai/gpt-oss-120b), which has a separate allowance, or try again tomorrow."
                     ) from exc
                 if attempt == attempts - 1:
                     raise
