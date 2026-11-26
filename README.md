@@ -6,6 +6,8 @@
 
 ### [🚀 Try the live demo →](https://autonomous-research-agent-arpit.streamlit.app)
 
+[📄 Project report (PDF)](docs/PROJECT_REPORT.pdf) · [🎬 Showcase video](docs/showcase.mp4)
+
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit%20Cloud-FF4B4B?logo=streamlit&logoColor=white)](https://autonomous-research-agent-arpit.streamlit.app)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![CrewAI](https://img.shields.io/badge/CrewAI-multi--agent-FF5A50)](https://www.crewai.com/)
