@@ -98,6 +98,7 @@ if st.button("🚀 Run agent", type="primary", disabled=not goal.strip()):
     trace_file = open(settings.output_dir / "stall_trace.log", "w", encoding="utf-8")
     faulthandler.dump_traceback_later(45, repeat=True, file=trace_file)
 
+    faulthandler.enable(file=sys.stderr, all_threads=True)   # again: native libs imported since may replace the handler
     th = threading.Thread(target=worker, daemon=True)
     th.start()
     started, n_tools = time.time(), 0
