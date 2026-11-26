@@ -99,7 +99,7 @@ Getting a multi-agent system to run reliably on a free API took more than the ag
 | Model glitches | Occasional `output_parse_failed` / `tool_use_failed` / timeouts | Retried as transient errors, separately from rate limits |
 | Token cost | Enforcing figures at every stage re-ran all searches (≈270K tokens/run) | Figures enforced once, at the end, by code; research retries only for source problems |
 | Python version | CrewAI has no wheels for Python 3.14 | Project pinned to Python 3.12 |
-| Cloud-only segfaults | The deployed app crashed about 45 s into every run, with no Python traceback | A stack-dump watchdog left over from debugging dumped all threads while CrewAI's pool was creating and ending them, which crashed CPython on Linux. Removed; web search also moved to a child process so a native crash in the search client costs one query, not the server |
+| Cloud-only segfaults | The deployed app crashed about 45 s into each long run, with no Python traceback | The crashes lined up with a stack-dump watchdog left over from local debugging, which fired every 45 s and dumped all threads while CrewAI's pool was starting and ending them; it was removed. Web search also moved to a child process, so a native crash in the search client costs one query, not the server |
 
 ## 🗂 Project structure
 
