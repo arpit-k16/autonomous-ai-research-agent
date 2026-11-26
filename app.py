@@ -84,7 +84,9 @@ if st.button("🚀 Run agent", type="primary", disabled=not goal.strip()):
 
     def worker() -> None:  # runs CrewAI off the Streamlit thread; events go through the queue
         try:
-            box["result"] = run(goal, on_event=lambda kind, data: events.put((kind, data)))
+            box["result"] = run(goal, on_event=lambda kind, data: (
+                print(f"[agent] {kind}: {str(data)[:160]}", flush=True),   # progress in the server logs
+                events.put((kind, data))))
         except Exception as exc:  # surfaced in the UI below
             box["error"] = exc
         finally:  # released by the worker, so a page reload mid-run can't leave the lock held

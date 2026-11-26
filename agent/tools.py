@@ -24,6 +24,7 @@ from .config import settings
 USER_AGENT = "Mozilla/5.0 (compatible; PortfolioResearchAgent/1.0)"
 MAX_PAGE_BYTES = 2_000_000   # stop reading huge pages
 PAGE_DEADLINE_S = 20.0       # total time budget per page, not just per chunk
+SEARCH_TIMEOUT_S = 30        # a web search runs in a child process and is killed after this
 
 # Every URL / file the tools actually returned during a run. Used afterwards to verify that the
 # sources cited in the final report were really seen by the agent (and not recalled from memory).
@@ -97,9 +98,25 @@ class WebSearchTool(BaseTool):
     max_results: int = settings.search_results
 
     def _search(self, query: str) -> list[dict]:
-        from ddgs import DDGS
+        """Run the search in a child process.
 
-        return list(DDGS().text(query, max_results=self.max_results))
+        ddgs talks HTTP through a native (Rust) client. On Linux hosts such as Streamlit Cloud, calling
+        it from CrewAI's worker threads segfaulted the whole server. In a separate process a crash or
+        hang costs one search, not the app.
+        """
+        import json
+        import subprocess
+        import sys
+
+        code = ("import json, sys\n"
+                "from ddgs import DDGS\n"
+                "q, n = sys.argv[1], int(sys.argv[2])\n"
+                "print(json.dumps(list(DDGS().text(q, max_results=n))))")
+        proc = subprocess.run([sys.executable, "-c", code, query, str(self.max_results)],
+                              capture_output=True, text=True, timeout=SEARCH_TIMEOUT_S, encoding="utf-8")
+        if proc.returncode != 0:
+            raise RuntimeError(f"search process failed (exit {proc.returncode}): {proc.stderr.strip()[-300:]}")
+        return json.loads(proc.stdout.strip().splitlines()[-1]) if proc.stdout.strip() else []
 
     def _run(self, query: str) -> str:
         try:
