@@ -4,6 +4,9 @@
 
 **Give it a goal. It plans, searches the web and your documents, does the maths, and delivers a sourced report. Every number in that report is fact-checked against what the agent actually read.**
 
+### [🚀 Try the live demo →](https://autonomous-research-agent-arpit.streamlit.app)
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit%20Cloud-FF4B4B?logo=streamlit&logoColor=white)](https://autonomous-research-agent-arpit.streamlit.app)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![CrewAI](https://img.shields.io/badge/CrewAI-multi--agent-FF5A50)](https://www.crewai.com/)
 [![Groq](https://img.shields.io/badge/Groq-gpt--oss-F55036)](https://console.groq.com/)
@@ -96,6 +99,7 @@ Getting a multi-agent system to run reliably on a free API took more than the ag
 | Model glitches | Occasional `output_parse_failed` / `tool_use_failed` / timeouts | Retried as transient errors, separately from rate limits |
 | Token cost | Enforcing figures at every stage re-ran all searches (≈270K tokens/run) | Figures enforced once, at the end, by code; research retries only for source problems |
 | Python version | CrewAI has no wheels for Python 3.14 | Project pinned to Python 3.12 |
+| Cloud-only segfaults | The deployed app crashed about 45 s into every run, with no Python traceback | A stack-dump watchdog left over from debugging dumped all threads while CrewAI's pool was creating and ending them, which crashed CPython on Linux. Removed; web search also moved to a child process so a native crash in the search client costs one query, not the server |
 
 ## 🗂 Project structure
 
